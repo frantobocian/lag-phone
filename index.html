@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        margin: 0;
+        background: #000;
+        color: #0f0;
+        font-family: monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        user-select: none;
+    }
+    .box {
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+    }
+    .bar {
+        width: 100%;
+        height: 20px;
+        border: 1px solid #0f0;
+        margin-top: 20px;
+        position: relative;
+    }
+    .fill {
+        height: 100%;
+        width: 0%;
+        background: #0f0;
+        transition: width 0.8s ease;
+    }
+    .text {
+        margin-top: 15px;
+        min-height: 2em;
+        font-size: 14px;
+    }
+    .final {
+        font-size: 18px;
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<div class="box">
+    <div id="percent">0%</div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="text" id="text">Inicjalizacja systemu…</div>
+    <div class="final" id="final">
+        ✔ Zakończono<br><br>
+        To nie był lag.<br>
+        To był test cierpliwości.
+    </div>
+</div>
+
+<script>
+let percent = 0;
+
+const percentEl = document.getElementById("percent");
+const fillEl = document.getElementById("fill");
+const textEl = document.getElementById("text");
+const finalEl = document.getElementById("final");
+
+const messages = [
+    "Sprawdzanie pamięci…",
+    "Optymalizacja RAM…",
+    "Analiza urządzenia…",
+    "Proszę nie dotykać…",
+    "Prawie gotowe…",
+    "To normalne…"
+];
+
+function randomDelay() {
+    return 800 + Math.random() * 2200;
+}
+
+function step() {
+    if (percent >= 100) {
+        percentEl.style.display = "none";
+        fillEl.parentElement.style.display = "none";
+        textEl.style.display = "none";
+        finalEl.style.display = "block";
+        return;
+    }
+
+    let jump = Math.random() < 0.15 ? -Math.floor(Math.random() * 5) : 1;
+    percent = Math.max(0, percent + jump);
+
+    percentEl.textContent = percent + "%";
+    fillEl.style.width = percent + "%";
+    textEl.textContent = messages[Math.floor(Math.random() * messages.length)];
+
+    setTimeout(step, randomDelay());
+}
+
+setTimeout(step, 1500);
+</script>
+
+</body>
+</html>
