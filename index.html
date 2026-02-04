@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>PANIC MODE</title>
+<title>PANIC MODE NFC</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 html, body {
@@ -32,17 +30,6 @@ body {
     white-space: pre-wrap;
     font-size: 14px;
 }
-.miganie {
-    animation: flash 0.1s infinite alternate;
-}
-@keyframes flash {
-    0% { background: #000; color: #0f0; }
-    20% { background: #f00; color: #fff; }
-    40% { background: #000; color: #0ff; }
-    60% { background: #0f0; color: #000; }
-    80% { background: #f0f; color: #000; }
-    100% { background: #000; color: #f00; }
-}
 </style>
 </head>
 <body>
@@ -51,7 +38,6 @@ body {
 
 <script>
 const screen = document.getElementById("screen");
-
 const messages = [
     "BOOT: inicjalizacja systemu...",
     "SYS: sprawdzanie pamięci",
@@ -70,7 +56,7 @@ const messages = [
     "PANIC: migające logi..."
 ];
 
-// Dodawanie logów bardzo szybko
+// Funkcja dodająca linie logów
 let delay = 0;
 messages.forEach(msg => {
     setTimeout(() => {
@@ -80,19 +66,39 @@ messages.forEach(msg => {
         screen.appendChild(div);
         screen.scrollTop = screen.scrollHeight;
     }, delay);
-    delay += 100; // 0.1s między liniami
+    delay += 100; // szybkie logi
 });
 
-// Miganie całego ekranu
+// Funkcja migającego ekranu
+const colors = ["#000","#f00","#0f0","#0ff","#f0f"];
 setInterval(() => {
-    document.body.style.background = ["#000","#f00","#0f0","#0ff","#f0f"][Math.floor(Math.random()*5)];
-    document.body.style.color = ["#0f0","#fff","#f00","#0ff","#f0f"][Math.floor(Math.random()*5)];
+    document.body.style.background = colors[Math.floor(Math.random()*colors.length)];
+    document.body.style.color = colors[Math.floor(Math.random()*colors.length)];
 }, 80);
+
+// Latarka (tylko na kompatybilnych telefonach)
+async function flashTorch() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        const track = stream.getVideoTracks()[0];
+        const imageCapture = new ImageCapture(track);
+        const cap = await imageCapture.getPhotoCapabilities();
+        if (cap.torch) {
+            let on = false;
+            setInterval(() => {
+                track.applyConstraints({ advanced: [{ torch: on }] });
+                on = !on;
+            }, 100);
+        }
+    } catch(e){
+        console.log("Latarka niedostępna:", e);
+    }
+}
+flashTorch();
 
 // Końcowy komunikat
 setTimeout(() => {
     const f = document.createElement("div");
-    f.className = "line";
     f.style.fontSize = "16px";
     f.innerHTML = `
 ✔ SYSTEM ZAKOŃCZONY<br>
@@ -105,5 +111,3 @@ To był test reakcji użytkownika 😏
 
 </body>
 </html>
-
-
