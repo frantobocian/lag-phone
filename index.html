@@ -2,16 +2,17 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Tryb serwisowy</title>
+<title>PANIC MODE</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: monospace;
     background: #000;
     color: #0f0;
-    font-family: monospace;
-    height: 100%;
 }
 body {
     display: flex;
@@ -19,32 +20,22 @@ body {
     align-items: center;
 }
 #screen {
-    width: 95%;
-    max-width: 480px;
-    height: 90vh;
-    border: 1px solid #0f0;
-    padding: 10px;
-    overflow-y: auto;
-    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    text-align: center;
 }
 .line {
     white-space: pre-wrap;
-    animation: flicker 0.15s infinite alternate;
 }
-.warn {
-    color: #f00;
+.miganie {
+    animation: flash 0.1s infinite alternate;
 }
-.ok {
-    color: #0f0;
-}
-.final {
-    color: #0ff;
-    font-size: 16px;
-    margin-top: 10px;
-}
-@keyframes flicker {
-    from { opacity: 1; }
-    to { opacity: 0.85; }
+@keyframes flash {
+    0% { background: #000; color: #0f0; }
+    25% { background: #f00; color: #fff; }
+    50% { background: #000; color: #0f0; }
+    75% { background: #0ff; color: #000; }
+    100% { background: #000; color: #f0f; }
 }
 </style>
 </head>
@@ -55,61 +46,54 @@ body {
 <script>
 const screen = document.getElementById("screen");
 
-const lines = [
-    "BOOT: entering service mode...",
-    "KERNEL: debug flags enabled",
-    "SYS: mounting /system",
-    "SYS: mounting /data",
-    "CHECK: hardware interface",
-    "CHECK: memory blocks",
-    "WARN: unstable response detected",
-    "INFO: switching to diagnostic channel",
-    "LOG: sensor stream active",
-    "LOG: cpu governor override",
-    "WARN: unexpected latency spike",
-    "WARN: do NOT power off device",
-    "INFO: technician access only",
-    "LOG: dumping runtime state",
-    "LOG: analysing user interaction",
-    "INFO: diagnostic almost complete"
+const messages = [
+    "BOOT: inicjalizacja systemu...",
+    "SYS: sprawdzanie pamięci",
+    "SYS: analiza procesów",
+    "WARN: niestabilny moduł CPU",
+    "LOG: debug kernel",
+    "ERROR: opóźnienie wykryte",
+    "SYSTEM: przejście do trybu awaryjnego",
+    "WARNING: nie wyłączaj urządzenia!",
+    "LOG: nadpisywanie rejestrów",
+    "DEBUG: generowanie losowych alertów",
+    "WARN: krytyczna reakcja",
+    "INFO: uruchamianie interfejsu serwisowego",
+    "LOG: testowanie wejść użytkownika",
+    "SYSTEM: przyspieszanie procesów",
+    "PANIC: migające logi..."
 ];
 
-let i = 0;
-
-function addLine(text, cls="line") {
+function addLine(text) {
     const div = document.createElement("div");
-    div.className = cls;
+    div.className = "line miganie";
     div.textContent = "> " + text;
     screen.appendChild(div);
     screen.scrollTop = screen.scrollHeight;
 }
 
-function nextLine() {
-    if (i < lines.length) {
-        const isWarn = lines[i].includes("WARN");
-        addLine(lines[i], "line " + (isWarn ? "warn" : ""));
-        i++;
-        setTimeout(nextLine, 600 + Math.random() * 900);
-    } else {
-        setTimeout(showFinal, 1500);
+function run() {
+    for (let i = 0; i < messages.length; i++) {
+        setTimeout(() => addLine(messages[i]), i * 120);
     }
+    setTimeout(finalMessage, messages.length * 130);
 }
 
-function showFinal() {
-    addLine("STATUS: diagnostic finished", "ok");
-    addLine("", "line");
+function finalMessage() {
     const f = document.createElement("div");
-    f.className = "final";
+    f.className = "line miganie";
     f.innerHTML = `
-✔ Tryb serwisowy zakończony<br><br>
-To nie był błąd systemu.<br>
-To był test reakcji użytkownika 😏
+✔ SYSTEM ZAKOŃCZONY<br>
+To był test reakcjii<br>
+Nie ma żadnych szkód!
     `;
     screen.appendChild(f);
-    screen.scrollTop = screen.scrollHeight;
 }
 
-setTimeout(nextLine, 1200);
+run();
+setInterval(() => {
+    document.body.classList.toggle("miganie");
+}, 100);
 </script>
 
 </body>
