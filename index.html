@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -23,19 +25,23 @@ body {
     width: 100%;
     height: 100%;
     text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
 }
 .line {
     white-space: pre-wrap;
+    font-size: 14px;
 }
 .miganie {
     animation: flash 0.1s infinite alternate;
 }
 @keyframes flash {
     0% { background: #000; color: #0f0; }
-    25% { background: #f00; color: #fff; }
-    50% { background: #000; color: #0f0; }
-    75% { background: #0ff; color: #000; }
-    100% { background: #000; color: #f0f; }
+    20% { background: #f00; color: #fff; }
+    40% { background: #000; color: #0ff; }
+    60% { background: #0f0; color: #000; }
+    80% { background: #f0f; color: #000; }
+    100% { background: #000; color: #f00; }
 }
 </style>
 </head>
@@ -64,37 +70,40 @@ const messages = [
     "PANIC: migające logi..."
 ];
 
-function addLine(text) {
-    const div = document.createElement("div");
-    div.className = "line miganie";
-    div.textContent = "> " + text;
-    screen.appendChild(div);
-    screen.scrollTop = screen.scrollHeight;
-}
+// Dodawanie logów bardzo szybko
+let delay = 0;
+messages.forEach(msg => {
+    setTimeout(() => {
+        const div = document.createElement("div");
+        div.className = "line";
+        div.textContent = "> " + msg;
+        screen.appendChild(div);
+        screen.scrollTop = screen.scrollHeight;
+    }, delay);
+    delay += 100; // 0.1s między liniami
+});
 
-function run() {
-    for (let i = 0; i < messages.length; i++) {
-        setTimeout(() => addLine(messages[i]), i * 120);
-    }
-    setTimeout(finalMessage, messages.length * 130);
-}
+// Miganie całego ekranu
+setInterval(() => {
+    document.body.style.background = ["#000","#f00","#0f0","#0ff","#f0f"][Math.floor(Math.random()*5)];
+    document.body.style.color = ["#0f0","#fff","#f00","#0ff","#f0f"][Math.floor(Math.random()*5)];
+}, 80);
 
-function finalMessage() {
+// Końcowy komunikat
+setTimeout(() => {
     const f = document.createElement("div");
-    f.className = "line miganie";
+    f.className = "line";
+    f.style.fontSize = "16px";
     f.innerHTML = `
 ✔ SYSTEM ZAKOŃCZONY<br>
-To był test reakcjii<br>
-Nie ma żadnych szkód!
+To był test reakcji użytkownika 😏
     `;
     screen.appendChild(f);
-}
-
-run();
-setInterval(() => {
-    document.body.classList.toggle("miganie");
-}, 100);
+    screen.scrollTop = screen.scrollHeight;
+}, delay + 200);
 </script>
 
 </body>
 </html>
+
+
